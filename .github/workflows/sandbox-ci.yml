@@ -1,0 +1,21 @@
+name: Sandbox CI
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+permissions:
+  contents: read
+  pull-requests: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      # Trusted validator from the base revision; never execute student code.
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683af
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          persist-credentials: false
+      - name: Validate contribution through GitHub API
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/validate.mjs
